@@ -2,6 +2,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from api.recommendations import router as recommendations_router
+from mangum import Mangum  # <-- for Vercel/Lambda compatibility
 
 app = FastAPI(title="Internship Recommendation API")
 
@@ -14,8 +15,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Register routes
 app.include_router(recommendations_router, prefix="/api/v1")
 
 @app.get("/")
 def read_root():
     return {"status": "API is running"}
+
+# Export handler for Vercel
+handler = Mangum(app)
